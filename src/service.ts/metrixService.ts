@@ -37,18 +37,34 @@ class MetrixService {
       .save()
   }
 
-  async getMetrixByType(type: string) {
+  async getMetrixByType(type: string, convertTo?: string) {
     if (!Object.values(Metrix.METRIX_TYPE).includes(type)) {
       throw new Error('incorrect1')
     }
 
-    return await Metrix.createQueryBuilder()
+    const data = await Metrix.createQueryBuilder()
       .where('Metrix.Type = :type', { type })
+      .leftJoinAndSelect('Metrix.temperatureUnit', 'TemperatureUnit')
+      .leftJoinAndSelect('Metrix.distanceUnit', 'DistanceUnit')
       .getMany()
+
+    if (!!convertTo) {
+      const convertFunction = Metrix.getConverFunctionByUnit(convertTo, type)
+      for (const item of data) {
+        item.convert(convertFunction)
+      }
+    }
+    return data
   }
 
-  async getDataForPeriodDate(type: string, dateOptions: { selectedDate?: Date; fromDate?: Date; endDate?: Date }) {
-    return await Metrix.createQueryBuilder()
+  async getDataForPeriodDate(
+    type: string,
+    dateOptions: { selectedDate?: Date; fromDate?: Date; endDate?: Date },
+    convertTo?: string
+  ) {
+    const data = await Metrix.createQueryBuilder()
+      .leftJoinAndSelect('Metrix.temperatureUnit', 'TemperatureUnit')
+      .leftJoinAndSelect('Metrix.distanceUnit', 'DistanceUnit')
       .where('Metrix.Type = :type', { type })
       .andWhere(
         new Brackets(qb => {
@@ -66,6 +82,14 @@ class MetrixService {
         })
       )
       .getMany()
+
+    if (!!convertTo) {
+      const convertFunction = Metrix.getConverFunctionByUnit(convertTo, type)
+      for (const item of data) {
+        item.convert(convertFunction)
+      }
+    }
+    return data
   }
 }
 

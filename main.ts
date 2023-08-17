@@ -15,7 +15,13 @@ const main = async () => {
 
   await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
 
-  console.log(await metrixService.getDataForPeriodDate(Metrix.METRIX_TYPE.Distance, { selectedDate: new Date() }))
+  console.log(
+    await metrixService.getDataForPeriodDate(
+      Metrix.METRIX_TYPE.Distance,
+      { selectedDate: new Date() },
+      DistanceUnit.DistanceUnitName.METER
+    )
+  )
 }
 ;(async () => {
   await main()
