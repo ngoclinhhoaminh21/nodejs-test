@@ -1,0 +1,30 @@
+version: '3.2'
+
+networks:
+  my-network:
+    driver: bridge
+
+services:
+  # For M1 devices, use this service instead
+  # After init container, access to db directory (cd db)
+  #  Execute this command in terminal:
+  #  docker run -it -v `pwd`:/seed --network nodejs-test_my-network mcr.microsoft.com/mssql-tools
+  #
+  #  After access to docker container, run this command for seed data
+  #  sqlcmd -S dbm1 -U SA -P 'Acciona@1234' -d master -i seed/seed.sql
+
+  dbm1:
+    container_name: dbm1
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    ports:
+      - '1433:1433'
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      MSSQL_SA_PASSWORD: 'Acciona@1234'
+      ACCEPT_EULA: '1'
+    networks:
+      - my-network
+    restart: unless-stopped
+
+  

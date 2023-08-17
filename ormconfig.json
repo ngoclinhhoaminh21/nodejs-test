@@ -1,0 +1,7 @@
+{
+    "migrations": ["db/migration/*.ts"],
+    "cli": {
+        "migrationsDir": "db/migration",
+        "entitiesDir": "src/entities"
+    }
+}
