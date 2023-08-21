@@ -1,3 +1,5 @@
+import { addDays } from 'date-fns'
+
 import { connectToDb } from './src/connectToDb'
 import { DistanceUnit } from './src/entities/DistanceUnit'
 import { Metrix } from './src/entities/Metrix'
@@ -14,11 +16,15 @@ const main = async () => {
   }
 
   await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
+  await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
+  await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
+  await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
+  await metrixService.addMetrix(12, Metrix.METRIX_TYPE.Distance, DistanceUnit.DistanceUnitName.CENTIMETER)
 
   console.log(
     await metrixService.getDataForPeriodDate(
       Metrix.METRIX_TYPE.Distance,
-      { selectedDate: new Date() },
+      { fromDate: addDays(new Date(), -1), endDate: addDays(new Date(), 1) },
       DistanceUnit.DistanceUnitName.METER
     )
   )

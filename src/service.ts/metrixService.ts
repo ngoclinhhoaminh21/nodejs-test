@@ -65,13 +65,23 @@ class MetrixService {
     const data = await Metrix.createQueryBuilder()
       .leftJoinAndSelect('Metrix.temperatureUnit', 'TemperatureUnit')
       .leftJoinAndSelect('Metrix.distanceUnit', 'DistanceUnit')
+      .leftJoin(
+        qb => {
+          return qb
+            .subQuery()
+            .from(Metrix, 'Metrix')
+            .select([
+              'Metrix.ID as ID',
+              'ROW_NUMBER() OVER (PARTITION BY CAST(Metrix.CreatedDate as date)  ORDER BY Metrix.CreatedDate DESC) as row_number'
+            ])
+        },
+        'TempTable',
+        'TempTable.ID = Metrix.ID'
+      )
       .where('Metrix.Type = :type', { type })
       .andWhere(
         new Brackets(qb => {
           qb.where('1=1')
-
-          !!dateOptions.selectedDate &&
-            qb.orWhere('CAST(Metrix.CreatedDate AS DATE) = :Date', { Date: formatIsoDate(dateOptions.selectedDate) })
 
           !!dateOptions.fromDate &&
             !!dateOptions.endDate &&
@@ -81,6 +91,7 @@ class MetrixService {
             })
         })
       )
+      .andWhere('TempTable.row_number = 1')
       .getMany()
 
     if (!!convertTo) {
